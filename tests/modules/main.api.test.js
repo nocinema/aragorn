@@ -65,7 +65,7 @@ describe('MainAPI', () => {
             .catch(done);
     });
 
-    it.only('getNextSessionByCity(): Returns JSON schedule accordint with city', (done) => {
+    it('getNextSessionByCity(): Returns JSON schedule accordint with city', (done) => {
         let city = 'florianopolis';
 
         API.getNextSessionByCity(city)
