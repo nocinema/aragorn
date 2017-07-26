@@ -249,7 +249,6 @@ module.exports = class MainAPI {
             }
 
             let today = this.getDate();
-
             let condition = {
                 city_normalized: city,
                 recorded: {
@@ -267,6 +266,66 @@ module.exports = class MainAPI {
         });
     }
 
+    getNextSessionByCity(city) {
+        return new Promise((resolve, reject) => {
+            this.getScheduleFromCity(city)
+                .then((response) => {
+                    let now = new Date();
+                    now = `${now.getHours()}:${now.getMinutes()}`;
+
+                    let nextSession = { title: '', cinema: '', city: '', hour: '23:59', place: '' };
+
+                    response.forEach((cinema) => {
+                        cinema.sessions.forEach((session) => {
+                            session.hours.forEach((hour) => {
+                                if (hour > now && hour < nextSession.hour) {
+                                    nextSession.title = session.title;
+                                    nextSession.hour = hour;
+                                    nextSession.cinema = cinema.cinema;
+                                    nextSession.place = cinema.place;
+                                    nextSession.city = cinema.city;
+                                }
+                            });
+                        });
+                    });        
+
+                    return resolve(nextSession);
+                })
+                .catch((err) => {
+                    return reject(err);
+                });
+        });
+    }
+
+    getCities() {
+        return new Promise((resolve, reject) => {
+            let today = this.getDate();
+            let condition = {
+                recorded: {
+                    $gte: today
+                }
+            };
+
+            schedulesSchema.find(condition).lean().exec(function(err, cinemaObj) {
+                if (err) {
+                    return reject(err);
+                }
+
+                let cities = [];
+
+                cinemaObj.map(value => {
+                    if (cities.indexOf(value.city) === -1) {
+                        cities.push(value.city);
+                    }
+                });
+
+                cities = cities.sort();
+
+                return resolve(cities);
+            });
+        });
+    }
+
     getDate() {
         let now = Date.now();
         let oneDay = ( 1000 * 60 * 60 * 24 );
@@ -274,5 +333,4 @@ module.exports = class MainAPI {
 
         return today;
     }
-
 }
