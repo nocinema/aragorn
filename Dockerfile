@@ -1,9 +1,9 @@
-FROM nodesource/node:4.0
+FROM nodesource/node:6
 
-ADD package.json package.json
-RUN npm install
+ADD package.json ./
+RUN npm install --production
 ADD . .
 
-EXPOSE 3000
+CMD node server.js
 
-CMD ["node","server.js"]
+EXPOSE 3030
