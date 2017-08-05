@@ -1,11 +1,10 @@
 'use strict';
 
-let restify = require('restify');
-let path = require('path');
-let server = restify.createServer();
-let port = 3030;
-
-let API = require(path.join(__dirname, '', 'index')).MainAPI;
+const restify = require('restify');
+const path = require('path');
+const server = restify.createServer();
+const port = process.env.ARAGORN_PORT;
+const API = require(path.join(__dirname, '', 'index')).MainAPI;
 
 server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
@@ -71,5 +70,5 @@ server.get('/cidades', function(req, res) {
 });
 
 server.listen(port, function() {
-    console.log("Server started @ 3000");
+    console.log(`Server started @ ${port}`);
 });
